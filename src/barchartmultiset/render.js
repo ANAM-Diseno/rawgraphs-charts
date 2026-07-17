@@ -36,6 +36,11 @@ export function render(
     // legend
     showLegend,
     legendWidth,
+    // etiquetas de valores
+    mostrarEtiquetas,
+    posicionEtiqueta,
+    rotacionEtiqueta,
+    formatoEtiqueta,
   } = visualOptions
 
   const margin = {
@@ -256,6 +261,36 @@ export function render(
       .attr('display', serieIndex == 0 || repeatAxesLabels ? null : 'none')
       .styles(styles.axisLabel)
       .text('Value')
+
+    if (mostrarEtiquetas) {
+      const fmt = formatoEtiqueta
+        ? (v) => { try { return d3.format(formatoEtiqueta)(v) } catch (e) { return v } }
+        : (v) => v
+
+      selection
+        .append('g')
+        .attr('class', 'etiquetas')
+        .selectAll('text')
+        .data((d) => d.data[1])
+        .join('text')
+        .attr('class', 'etiqueta')
+        .style(
+          'text-anchor',
+          rotacionEtiqueta < 0 ? 'end' : rotacionEtiqueta === 0 ? 'middle' : 'start'
+        )
+        .style('dominant-baseline', 'middle')
+        .attr('transform', (d) => {
+          const cx = setScale(d.groups) + barScale(d.bars) + barScale.bandwidth() / 2
+          const yTop = sizeScale(Math.max(0, d.size))
+          const barHeight = Math.abs(sizeScale(d.size) - sizeScale(0))
+          const y =
+            posicionEtiqueta === 'arriba' ? yTop - 8
+            : posicionEtiqueta === 'mitad' ? yTop + barHeight / 2
+            : yTop + barHeight + 8
+          return `translate(${cx},${y}) rotate(${-rotacionEtiqueta})`
+        })
+        .text((d) => fmt(d.size))
+    }
   })
 
   // add legend

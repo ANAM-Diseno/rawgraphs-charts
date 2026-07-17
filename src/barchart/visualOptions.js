@@ -80,7 +80,7 @@ export const visualOptions = {
   },
   ejexRotacionEtiquetas: {
     type: 'number',
-    label: 'X axis label rotation',
+    label: 'Rotación de etiquetas eje X',
     default: 0,
     min: -90,
     max: 90,
@@ -143,5 +143,43 @@ export const visualOptions = {
       interpolator: 'interpolateSpectral',
     },
     group: 'colors',
+  },
+
+  mostrarEtiquetas: {
+    type: 'boolean',
+    label: 'Mostrar etiquetas de valores',
+    default: false,
+    group: 'etiquetas',
+  },
+
+  posicionEtiqueta: {
+    type: 'text',
+    label: 'Posición de la etiqueta',
+    default: 'arriba',
+    options: [
+      { label: 'Arriba de la barra', value: 'arriba' },
+      { label: 'Centro de la barra', value: 'mitad' },
+      { label: 'Abajo de la barra', value: 'abajo' },
+    ],
+    group: 'etiquetas',
+    disabled: { mostrarEtiquetas: false },
+  },
+
+  rotacionEtiqueta: {
+    type: 'number',
+    label: 'Rotación de la etiqueta',
+    default: 0,
+    min: -90,
+    max: 90,
+    group: 'etiquetas',
+    disabled: { mostrarEtiquetas: false },
+  },
+
+  formatoEtiqueta: {
+    type: 'text',
+    label: 'Formato de número (d3)',
+    default: '',
+    group: 'etiquetas',
+    disabled: { mostrarEtiquetas: false },
   },
 }

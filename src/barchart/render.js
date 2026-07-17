@@ -37,6 +37,11 @@ export function render(
     // legend
     showLegend,
     legendWidth,
+    // etiquetas de valores
+    mostrarEtiquetas,
+    posicionEtiqueta,
+    rotacionEtiqueta,
+    formatoEtiqueta,
   } = visualOptions
 
   const margin = {
@@ -272,6 +277,14 @@ export function render(
 
             .text(mapping['bars'].value)
         )
+
+      yAxis
+        .selectAll('text')
+        .attr('class', 'vis-valores-ejes')
+        .attr('transform', `translate(-8,0)rotate(${ejexRotacionEtiquetas})`)
+        .attr('dy', `${-Math.abs(ejexRotacionEtiquetas / 90)}em`)
+        .style('dominant-baseline', ejexRotacionEtiquetas !== 0 ? 'middle' : 'inherit')
+        .style('text-anchor', ejexRotacionEtiquetas !== 0 ? 'start' : 'end')
     } else {
       const xAxis = selection
         .append('g')
@@ -293,10 +306,14 @@ export function render(
         )
       xAxis
         .selectAll('text')
-        .attr('transform', `rotate(${ejexRotacionEtiquetas})`)
-        .attr('text-anchor', ejexRotacionEtiquetas !== 0 ? 'end' : 'middle')
-        .attr('dx', ejexRotacionEtiquetas !== 0 ? '-0.8em' : null)
-        .attr('dy', ejexRotacionEtiquetas !== 0 ? '0.15em' : null)
+        .attr('class', 'vis-valores-ejes')
+        .attr('transform', `translate(0,8)rotate(${ejexRotacionEtiquetas})`)
+        .attr('dy', `${-Math.abs(ejexRotacionEtiquetas / 90)}em`)
+        .style('dominant-baseline', ejexRotacionEtiquetas !== 0 ? 'middle' : 'inherit')
+        .style(
+          'text-anchor',
+          ejexRotacionEtiquetas < 0 ? 'end' : ejexRotacionEtiquetas === 0 ? 'middle' : 'start'
+        )
 
       const yAxis = selection
         .append('g')
@@ -328,6 +345,47 @@ export function render(
         .attr('y', 4)
         .attr('x', 4)
         .styles(styles.seriesLabel)
+    }
+
+    if (mostrarEtiquetas) {
+      const fmt = formatoEtiqueta
+        ? (v) => { try { return d3.format(formatoEtiqueta)(v) } catch (e) { return v } }
+        : (v) => v
+
+      selection
+        .append('g')
+        .attr('class', 'etiquetas')
+        .selectAll('text')
+        .data((d) => d.data[1])
+        .join('text')
+        .attr('class', 'etiqueta')
+        .style(
+          'text-anchor',
+          rotacionEtiqueta < 0 ? 'end' : rotacionEtiqueta === 0 ? 'middle' : 'start'
+        )
+        .style('dominant-baseline', 'middle')
+        .attr('transform', (d) => {
+          if (horizontalBars) {
+            const cy = barScale(d.bars) + barScale.bandwidth() / 2
+            const xLeft = sizeScale(Math.min(0, d.size))
+            const xRight = sizeScale(Math.max(0, d.size))
+            const x =
+              posicionEtiqueta === 'arriba' ? xRight + 8
+              : posicionEtiqueta === 'mitad' ? (xLeft + xRight) / 2
+              : xLeft - 8
+            return `translate(${x},${cy}) rotate(${-rotacionEtiqueta})`
+          } else {
+            const cx = barScale(d.bars) + barScale.bandwidth() / 2
+            const yTop = sizeScale(Math.max(0, d.size))
+            const barHeight = Math.abs(sizeScale(d.size) - sizeScale(0))
+            const y =
+              posicionEtiqueta === 'arriba' ? yTop - 8
+              : posicionEtiqueta === 'mitad' ? yTop + barHeight / 2
+              : yTop + barHeight + 8
+            return `translate(${cx},${y}) rotate(${-rotacionEtiqueta})`
+          }
+        })
+        .text((d) => fmt(d.size))
     }
   })
 

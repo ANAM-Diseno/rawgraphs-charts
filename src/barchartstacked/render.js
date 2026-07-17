@@ -36,6 +36,11 @@ export function render(
     // legend
     showLegend,
     legendWidth,
+    // etiquetas de valores
+    mostrarEtiquetas,
+    posicionEtiqueta,
+    rotacionEtiqueta,
+    formatoEtiqueta,
   } = visualOptions
 
   const margin = {
@@ -287,6 +292,38 @@ export function render(
       .attr('display', serieIndex == 0 || repeatAxesLabels ? null : 'none')
       .text(mapping.stacks.value)
       .styles(styles.axisLabel)
+
+    if (mostrarEtiquetas) {
+      const fmt = formatoEtiqueta
+        ? (v) => { try { return d3.format(formatoEtiqueta)(v) } catch (e) { return v } }
+        : (v) => v
+
+      selection
+        .selectAll('g.etiquetas-capa')
+        .data(stackedData)
+        .join('g')
+        .attr('class', 'etiquetas-capa')
+        .selectAll('text.etiqueta')
+        .data((layer) => layer)
+        .join('text')
+        .attr('class', 'etiqueta')
+        .style(
+          'text-anchor',
+          rotacionEtiqueta < 0 ? 'end' : rotacionEtiqueta === 0 ? 'middle' : 'start'
+        )
+        .style('dominant-baseline', 'middle')
+        .attr('transform', (d) => {
+          const cx = stacksScale(d.data[0]) + stacksScale.bandwidth() / 2
+          const segHeight = sizeScale(d[0]) - sizeScale(d[1])
+          const yTop = sizeScale(d[1])
+          const y =
+            posicionEtiqueta === 'arriba' ? yTop - 8
+            : posicionEtiqueta === 'mitad' ? yTop + segHeight / 2
+            : yTop + segHeight + 8
+          return `translate(${cx},${y}) rotate(${-rotacionEtiqueta})`
+        })
+        .text((d) => fmt(d[1] - d[0]))
+    }
   })
 
   // add legend

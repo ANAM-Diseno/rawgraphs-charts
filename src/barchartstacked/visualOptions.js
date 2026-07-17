@@ -134,4 +134,42 @@ export const visualOptions = {
     },
     group: 'colors',
   },
+
+  mostrarEtiquetas: {
+    type: 'boolean',
+    label: 'Mostrar etiquetas de valores',
+    default: false,
+    group: 'etiquetas',
+  },
+
+  posicionEtiqueta: {
+    type: 'text',
+    label: 'Posición de la etiqueta',
+    default: 'arriba',
+    options: [
+      { label: 'Arriba del segmento', value: 'arriba' },
+      { label: 'Centro del segmento', value: 'mitad' },
+      { label: 'Abajo del segmento', value: 'abajo' },
+    ],
+    group: 'etiquetas',
+    disabled: { mostrarEtiquetas: false },
+  },
+
+  rotacionEtiqueta: {
+    type: 'number',
+    label: 'Rotación de la etiqueta',
+    default: 0,
+    min: -90,
+    max: 90,
+    group: 'etiquetas',
+    disabled: { mostrarEtiquetas: false },
+  },
+
+  formatoEtiqueta: {
+    type: 'text',
+    label: 'Formato de número (d3)',
+    default: '',
+    group: 'etiquetas',
+    disabled: { mostrarEtiquetas: false },
+  },
 }
