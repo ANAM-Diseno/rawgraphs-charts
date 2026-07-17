@@ -24,6 +24,7 @@ export function render(
     padding,
     barsOrientation,
     sortBarsBy,
+    ejexRotacionEtiquetas,
     // series options
     columnsNumber,
     useSameScale,
@@ -292,10 +293,10 @@ export function render(
         )
       xAxis
         .selectAll('text')
-        .attr('transform', `rotate(${xAxisLabelRotation})`)
-        .attr('text-anchor', xAxisLabelRotation !== 0 ? 'end' : 'middle')
-        .attr('dx', xAxisLabelRotation !== 0 ? '-0.8em' : null)
-        .attr('dy', xAxisLabelRotation !== 0 ? '0.15em' : null)
+        .attr('transform', `rotate(${ejexRotacionEtiquetas})`)
+        .attr('text-anchor', ejexRotacionEtiquetas !== 0 ? 'end' : 'middle')
+        .attr('dx', ejexRotacionEtiquetas !== 0 ? '-0.8em' : null)
+        .attr('dy', ejexRotacionEtiquetas !== 0 ? '0.15em' : null)
 
       const yAxis = selection
         .append('g')

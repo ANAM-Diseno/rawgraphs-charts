@@ -78,7 +78,7 @@ export const visualOptions = {
     ],
     default: 'name',
   },
-  xAxisLabelRotation: {
+  ejexRotacionEtiquetas: {
     type: 'number',
     label: 'X axis label rotation',
     default: 0,
@@ -86,7 +86,6 @@ export const visualOptions = {
     max: 90,
     group: 'chart',
   },
-
   useSameScale: {
     type: 'boolean',
     label: 'Use same scale',
