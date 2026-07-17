@@ -78,6 +78,14 @@ export const visualOptions = {
     ],
     default: 'name',
   },
+  xAxisLabelRotation: {
+    type: 'number',
+    label: 'X axis label rotation',
+    default: 0,
+    min: -90,
+    max: 90,
+    group: 'chart',
+  },
 
   useSameScale: {
     type: 'boolean',
