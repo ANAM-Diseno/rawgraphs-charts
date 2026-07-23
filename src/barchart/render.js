@@ -1,7 +1,7 @@
-import * as d3 from 'd3'
-import { legend, dateFormats } from '@rawgraphs/rawgraphs-core'
-import * as d3Gridding from 'd3-gridding'
-import '../d3-styles.js'
+import * as d3 from "d3";
+import { legend, dateFormats } from "@rawgraphs/rawgraphs-core";
+import * as d3Gridding from "d3-gridding";
+import "../d3-styles.js";
 
 export function render(
   svgNode,
@@ -9,7 +9,7 @@ export function render(
   visualOptions,
   mapping,
   originalData,
-  styles
+  styles,
 ) {
   const {
     // artboard options
@@ -20,11 +20,13 @@ export function render(
     marginRight,
     marginBottom,
     marginLeft,
+    ejexRotacionEtiquetas,
+    fuenteTipografica,
+    muestraEjeY,
     // chart options
     padding,
     barsOrientation,
     sortBarsBy,
-    ejexRotacionEtiquetas,
     // series options
     columnsNumber,
     useSameScale,
@@ -42,134 +44,134 @@ export function render(
     posicionEtiqueta,
     rotacionEtiqueta,
     formatoEtiqueta,
-  } = visualOptions
+  } = visualOptions;
 
   const margin = {
     top: marginTop,
     right: marginRight,
     bottom: marginBottom,
     left: marginLeft,
-  }
-  const horizontalBars = { horizontal: true, vertical: false }[barsOrientation]
+  };
+  const horizontalBars = { horizontal: true, vertical: false }[barsOrientation];
 
-  if (mapping.bars.dataType.type === 'date') {
+  if (mapping.bars.dataType.type === "date") {
     // set date format  from input data
     const timeFormat = d3.timeFormat(
-      dateFormats[mapping.bars.dataType.dateFormat]
-    )
+      dateFormats[mapping.bars.dataType.dateFormat],
+    );
     // use it to format date
     data.forEach((d) => {
-      d.bars = timeFormat(Date.parse(d.bars))
-    })
+      d.bars = timeFormat(Date.parse(d.bars));
+    });
   }
 
   // create nest structure
   const nestedData = d3
     .groups(data, (d) => d.series)
-    .map((d) => ({ data: d, totalSize: d3.sum(d[1], (d) => d.size) }))
+    .map((d) => ({ data: d, totalSize: d3.sum(d[1], (d) => d.size) }));
 
-  console.log(nestedData)
+  console.log(nestedData);
   // series sorting functions
   const seriesSortings = {
     totalDescending: function (a, b) {
-      return d3.descending(a.totalSize, b.totalSize)
+      return d3.descending(a.totalSize, b.totalSize);
     },
     totalAscending: function (a, b) {
-      return d3.ascending(a.totalSize, b.totalSize)
+      return d3.ascending(a.totalSize, b.totalSize);
     },
     name: function (a, b) {
-      return d3.ascending(a.data[0], b.data[0])
+      return d3.ascending(a.data[0], b.data[0]);
     },
-  }
+  };
   // sort series
-  nestedData.sort(seriesSortings[sortSeriesBy])
+  nestedData.sort(seriesSortings[sortSeriesBy]);
 
   // add background
   d3.select(svgNode)
-    .append('rect')
-    .attr('width', showLegend ? width + legendWidth : width)
-    .attr('height', height)
-    .attr('x', 0)
-    .attr('y', 0)
-    .attr('fill', background)
-    .attr('id', 'background')
+    .append("rect")
+    .attr("width", showLegend ? width + legendWidth : width)
+    .attr("height", height)
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("fill", background)
+    .attr("id", "background");
 
   // set up grid
   const gridding = d3Gridding
     .gridding()
     .size([width, height])
-    .mode('grid')
+    .mode("grid")
     .padding(0) // no padding, margins will be applied inside
-    .cols(mapping.series.value ? columnsNumber : 1)
+    .cols(mapping.series.value ? columnsNumber : 1);
 
-  const griddingData = gridding(nestedData)
+  const griddingData = gridding(nestedData);
 
-  const svg = d3.select(svgNode).append('g').attr('id', 'viz')
+  const svg = d3.select(svgNode).append("g").attr("id", "viz");
 
   const series = svg
-    .selectAll('g')
+    .selectAll("g")
     .data(griddingData)
-    .join('g')
-    .attr('id', (d) => d.data[0])
-    .attr('transform', (d) => 'translate(' + d.x + ',' + d.y + ')')
+    .join("g")
+    .attr("id", (d) => d.data[0])
+    .attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
 
   // value domain
-  let originalDomain = d3.extent(data, (d) => d.size)
+  let originalDomain = d3.extent(data, (d) => d.size);
   let sizeDomain =
-    originalDomain[0] > 0 ? [0, originalDomain[1]] : originalDomain
+    originalDomain[0] > 0 ? [0, originalDomain[1]] : originalDomain;
 
   // bars sorting functions
   const barsSortings = {
     totalDescending: function (a, b) {
-      return d3.descending(a[1], b[1])
+      return d3.descending(a[1], b[1]);
     },
     totalAscending: function (a, b) {
-      return d3.ascending(a[1], b[1])
+      return d3.ascending(a[1], b[1]);
     },
     name: function (a, b) {
-      return d3.ascending(a[0], b[0])
+      return d3.ascending(a[0], b[0]);
     },
     original: function (a, b) {
-      return true
+      return true;
     },
-  }
+  };
   // bars domain
   const barsDomain = d3
     .rollups(
       data,
       (v) => d3.sum(v, (d) => d.size),
-      (d) => d.bars
+      (d) => d.bars,
     )
     .sort(barsSortings[sortBarsBy])
-    .map((d) => d[0])
+    .map((d) => d[0]);
 
   // add grid
   if (showGrid) {
     svg
-      .append('g')
-      .attr('id', 'grid')
-      .selectAll('rect')
+      .append("g")
+      .attr("id", "grid")
+      .selectAll("rect")
       .data(griddingData)
       .enter()
-      .append('rect')
-      .attr('x', (d) => d.x)
-      .attr('y', (d) => d.y)
-      .attr('width', (d) => d.width)
-      .attr('height', (d) => d.height)
-      .attr('fill', 'none')
-      .attr('stroke', '#ccc')
+      .append("rect")
+      .attr("x", (d) => d.x)
+      .attr("y", (d) => d.y)
+      .attr("width", (d) => d.width)
+      .attr("height", (d) => d.height)
+      .attr("fill", "none")
+      .attr("stroke", "#ccc");
   }
 
   series.each(function (d, seriesIndex) {
     // make a local selection for each serie
     const selection = d3
       .select(this)
-      .append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // compute each serie width and height
-    const seriesWidth = d.width - margin.right - margin.left
-    const seriesHeight = d.height - margin.top - margin.bottom
+    const seriesWidth = d.width - margin.right - margin.left;
+    const seriesHeight = d.height - margin.top - margin.bottom;
 
     // check if padding is too high and leave no space for bars
     if (
@@ -177,8 +179,8 @@ export function render(
       (horizontalBars ? seriesHeight : seriesWidth)
     ) {
       throw new Error(
-        'Padding is too high, decrase it in the panel "chart" > "Padding"'
-      )
+        'Padding is too high, decrase it in the panel "chart" > "Padding"',
+      );
     }
     // scales
     const barScale = d3
@@ -188,236 +190,271 @@ export function render(
       //convert padding from px to percentage
       .padding(
         padding /
-          ((horizontalBars ? seriesHeight : seriesWidth) / barsDomain.length)
-      )
+          ((horizontalBars ? seriesHeight : seriesWidth) / barsDomain.length),
+      );
 
-    const seriesDomain = d3.extent(d.data[1], (d) => d.size)
+    const seriesDomain = d3.extent(d.data[1], (d) => d.size);
 
     const sizeScale = d3
       .scaleLinear()
       .domain(useSameScale ? sizeDomain : seriesDomain)
       .nice()
-      .range(horizontalBars ? [0, seriesWidth] : [seriesHeight, 0])
-
+      .range(horizontalBars ? [0, seriesWidth] : [seriesHeight, 0]);
+    const yAxis = selection.append("g").attr("id", "yAxis");
     const bars = selection
-      .append('g')
-      .attr('class', 'bars')
-      .selectAll('rect')
+      .append("g")
+      .attr("class", "bars")
+      .selectAll("rect")
       .data((d) => d.data[1])
-      .join('rect')
-      .attr('id', (d) => d.series + ' - ' + d.bars)
-      .attr('x', (d) => {
+      .join("rect")
+      .attr("id", (d) => d.series + " - " + d.bars)
+      .attr("x", (d) => {
         return horizontalBars
           ? sizeScale(Math.min(0, d.size))
-          : barScale(d.bars)
+          : barScale(d.bars);
       })
-      .attr('y', (d) => {
+      .attr("y", (d) => {
         return horizontalBars
           ? barScale(d.bars)
-          : sizeScale(Math.max(0, d.size))
+          : sizeScale(Math.max(0, d.size));
       })
-      .attr('height', (d) => {
+      .attr("height", (d) => {
         return horizontalBars
           ? barScale.bandwidth()
-          : Math.abs(sizeScale(d.size) - sizeScale(0))
+          : Math.abs(sizeScale(d.size) - sizeScale(0));
       })
-      .attr('width', (d) => {
+      .attr("width", (d) => {
         return horizontalBars
           ? Math.abs(sizeScale(d.size) - sizeScale(0))
-          : barScale.bandwidth()
+          : barScale.bandwidth();
       })
-      .attr('fill', (d) => colorScale(d.color))
+      .attr("fill", (d) => colorScale(d.color));
 
     if (horizontalBars) {
       const xAxis = selection
-        .append('g')
-        .attr('id', 'xAxis')
-        .attr('transform', 'translate(0,' + seriesHeight + ')')
+        .append("g")
+        .attr("id", "xAxis")
+        .attr("transform", "translate(0," + seriesHeight + ")")
         .call(d3.axisBottom(sizeScale))
         .call((g) =>
           g
-            .append('text')
-            .attr('font-family', 'Arial, sans-serif')
-            .attr('font-size', 10)
-            .attr('x', seriesWidth)
-            .attr('dy', -5)
-            .attr('fill', 'black')
-            .attr('font-weight', 'bold')
-            .attr('text-anchor', 'end')
+            .append("text")
+            .attr("font-family", fuenteTipografica)
+            .attr("font-size", 10)
+            .attr("x", seriesWidth)
+            .attr("dy", -5)
+            .attr("fill", "black")
+            .attr("font-weight", "bold")
+            .attr("text-anchor", "end")
             .attr(
-              'display',
-              seriesIndex === 0 || repeatAxesLabels ? null : 'none'
+              "display",
+              seriesIndex === 0 || repeatAxesLabels ? null : "none",
             )
             .text((d) => {
-              return mapping['size'].value
-                ? `${mapping['size'].value} [${mapping.size.config.aggregation}]`
-                : ''
-            })
-        )
+              return mapping["size"].value
+                ? `${mapping["size"].value} [${mapping.size.config.aggregation}]`
+                : "";
+            }),
+        );
 
       const yAxis = selection
-        .append('g')
-        .attr('id', 'yAxis')
-        .attr('transform', 'translate(' + sizeScale(0) + ',0)')
+        .append("g")
+        .attr("id", "yAxis")
+        .attr("transform", "translate(" + sizeScale(0) + ",0)")
         .call(d3.axisLeft(barScale).tickSizeOuter(0))
         .call((g) =>
           g
-            .append('text')
-            .attr('font-family', 'Arial, sans-serif')
-            .attr('font-size', 10)
-            .attr('x', 4)
-            .attr('fill', 'black')
-            .attr('font-weight', 'bold')
-            .attr('text-anchor', 'start')
-            .attr('dominant-baseline', 'hanging')
+            .append("text")
+            .attr("font-family", fuenteTipografica)
+            .attr("font-size", 10)
+            .attr("x", 4)
+            .attr("fill", "black")
+            .attr("font-weight", "bold")
+            .attr("text-anchor", "start")
+            .attr("dominant-baseline", "hanging")
             .attr(
-              'display',
-              seriesIndex === 0 || repeatAxesLabels ? null : 'none'
+              "display",
+              seriesIndex === 0 || repeatAxesLabels ? null : "none",
             )
 
-            .text(mapping['bars'].value)
-        )
+            .text(mapping["bars"].value),
+        );
 
       yAxis
-        .selectAll('text')
-        .attr('class', 'vis-valores-ejes')
-        .attr('transform', `translate(-8,0)rotate(${ejexRotacionEtiquetas})`)
-        .attr('dy', `${-Math.abs(ejexRotacionEtiquetas / 90)}em`)
-        .style('dominant-baseline', ejexRotacionEtiquetas !== 0 ? 'middle' : 'inherit')
-        .style('text-anchor', ejexRotacionEtiquetas !== 0 ? 'start' : 'end')
+        .selectAll("text")
+        .attr("class", "vis-valores-ejes")
+        .attr("transform", `translate(-8,0)rotate(${ejexRotacionEtiquetas})`)
+        .attr("dy", `${-Math.abs(ejexRotacionEtiquetas / 90)}em`)
+        .style(
+          "dominant-baseline",
+          ejexRotacionEtiquetas !== 0 ? "middle" : "inherit",
+        )
+        .style("text-anchor", ejexRotacionEtiquetas !== 0 ? "start" : "end");
+
+      yAxis.selectAll("text").attr("font-family", fuenteTipografica);
+      xAxis.selectAll("text").attr("font-family", fuenteTipografica);
+
+      if (!muestraEjeY) yAxis.remove();
     } else {
       const xAxis = selection
-        .append('g')
-        .attr('id', 'xAxis')
-        .attr('transform', 'translate(0,' + sizeScale(0) + ')')
+        .append("g")
+        .attr("id", "xAxis")
+        .attr("transform", "translate(0," + sizeScale(0) + ")")
         .call(d3.axisBottom(barScale).tickSizeOuter(0))
         .call((g) =>
           g
-            .append('text')
-            .attr('x', seriesWidth)
-            .attr('y', -4)
-            .attr('text-anchor', 'end')
+            .append("text")
+            .attr("x", seriesWidth)
+            .attr("y", -4)
+            .attr("text-anchor", "end")
             .attr(
-              'display',
-              seriesIndex === 0 || repeatAxesLabels ? null : 'none'
+              "display",
+              seriesIndex === 0 || repeatAxesLabels ? null : "none",
             )
-            .text(mapping['bars'].value)
-            .styles(styles.axisLabel)
-        )
+            .text(mapping["bars"].value)
+            .styles(styles.axisLabel),
+        );
       xAxis
-        .selectAll('text')
-        .attr('class', 'vis-valores-ejes')
-        .attr('transform', `translate(0,8)rotate(${ejexRotacionEtiquetas})`)
-        .attr('dy', `${-Math.abs(ejexRotacionEtiquetas / 90)}em`)
-        .style('dominant-baseline', ejexRotacionEtiquetas !== 0 ? 'middle' : 'inherit')
+        .selectAll("text")
+        .attr("transform", `translate(0,8)rotate(${ejexRotacionEtiquetas})`)
+        .attr("dy", `${-Math.abs(ejexRotacionEtiquetas / 90)}em`)
         .style(
-          'text-anchor',
-          ejexRotacionEtiquetas < 0 ? 'end' : ejexRotacionEtiquetas === 0 ? 'middle' : 'start'
+          "dominant-baseline",
+          ejexRotacionEtiquetas !== 0 ? "middle" : "inherit",
         )
+        .style(
+          "text-anchor",
+          ejexRotacionEtiquetas < 0
+            ? "end"
+            : ejexRotacionEtiquetas === 0
+              ? "middle"
+              : "start",
+        );
 
-      const yAxis = selection
-        .append('g')
-        .attr('id', 'yAxis')
+      yAxis
         .call(d3.axisLeft(sizeScale))
-        .call((g) =>
-          g
-            .append('text')
-            .attr('x', 4)
-            .attr('text-anchor', 'start')
-            .attr('dominant-baseline', 'hanging')
+        .call((g) => {
+          g.select("path").remove();
+          g.append("text")
+            .attr("x", 4)
+            .attr("text-anchor", "start")
+            .attr("dominant-baseline", "hanging")
             .attr(
-              'display',
-              seriesIndex === 0 || repeatAxesLabels ? null : 'none'
+              "display",
+              seriesIndex === 0 || repeatAxesLabels ? null : "none",
             )
             .text((d) => {
-              return mapping['size'].value
-                ? `${mapping['size'].value} [${mapping.size.config.aggregation}]`
-                : ''
+              return mapping["size"].value
+                ? `${mapping["size"].value} [${mapping.size.config.aggregation}]`
+                : "";
             })
-            .styles(styles.axisLabel)
-        )
+            .styles(styles.axisLabel);
+        })
+        .selectAll("g.tick line")
+        .style("stroke-dasharray", "3 3")
+        .style("stroke-opacity", 0.2)
+        .attr("x1", seriesWidth);
+      yAxis.selectAll("text").attr("font-family", fuenteTipografica);
+      xAxis.selectAll("text").attr("font-family", fuenteTipografica);
+
+      if (!muestraEjeY) yAxis.remove();
     }
 
     if (showSeriesLabels) {
       d3.select(this)
-        .append('text')
+        .append("text")
         .text((d) => d.data[0])
-        .attr('y', 4)
-        .attr('x', 4)
-        .styles(styles.seriesLabel)
+        .attr("y", 4)
+        .attr("x", 4)
+        .styles(styles.seriesLabel);
     }
 
     if (mostrarEtiquetas) {
       const fmt = formatoEtiqueta
-        ? (v) => { try { return d3.format(formatoEtiqueta)(v) } catch (e) { return v } }
-        : (v) => v
+        ? (v) => {
+            try {
+              return d3.format(formatoEtiqueta)(v);
+            } catch (e) {
+              return v;
+            }
+          }
+        : (v) => v;
 
       selection
-        .append('g')
-        .attr('class', 'etiquetas')
-        .selectAll('text')
+        .append("g")
+        .attr("class", "etiquetas")
+        .selectAll("text")
         .data((d) => d.data[1])
-        .join('text')
-        .attr('class', 'etiqueta')
+        .join("text")
+        .attr("class", "etiqueta")
         .style(
-          'text-anchor',
-          rotacionEtiqueta < 0 ? 'end' : rotacionEtiqueta === 0 ? 'middle' : 'start'
+          "text-anchor",
+          rotacionEtiqueta < 0
+            ? "end"
+            : rotacionEtiqueta === 0
+              ? "middle"
+              : "start",
         )
-        .style('dominant-baseline', 'middle')
-        .attr('transform', (d) => {
+        .style("dominant-baseline", "middle")
+        .attr("font-family", fuenteTipografica)
+        .attr("transform", (d) => {
           if (horizontalBars) {
-            const cy = barScale(d.bars) + barScale.bandwidth() / 2
-            const xLeft = sizeScale(Math.min(0, d.size))
-            const xRight = sizeScale(Math.max(0, d.size))
+            const cy = barScale(d.bars) + barScale.bandwidth() / 2;
+            const xLeft = sizeScale(Math.min(0, d.size));
+            const xRight = sizeScale(Math.max(0, d.size));
             const x =
-              posicionEtiqueta === 'arriba' ? xRight + 8
-              : posicionEtiqueta === 'mitad' ? (xLeft + xRight) / 2
-              : xLeft - 8
-            return `translate(${x},${cy}) rotate(${-rotacionEtiqueta})`
+              posicionEtiqueta === "arriba"
+                ? xRight + 8
+                : posicionEtiqueta === "mitad"
+                  ? (xLeft + xRight) / 2
+                  : xLeft - 8;
+            return `translate(${x},${cy}) rotate(${-rotacionEtiqueta})`;
           } else {
-            const cx = barScale(d.bars) + barScale.bandwidth() / 2
-            const yTop = sizeScale(Math.max(0, d.size))
-            const barHeight = Math.abs(sizeScale(d.size) - sizeScale(0))
+            const cx = barScale(d.bars) + barScale.bandwidth() / 2;
+            const yTop = sizeScale(Math.max(0, d.size));
+            const barHeight = Math.abs(sizeScale(d.size) - sizeScale(0));
             const y =
-              posicionEtiqueta === 'arriba' ? yTop - 8
-              : posicionEtiqueta === 'mitad' ? yTop + barHeight / 2
-              : yTop + barHeight + 8
-            return `translate(${cx},${y}) rotate(${-rotacionEtiqueta})`
+              posicionEtiqueta === "arriba"
+                ? yTop - 8
+                : posicionEtiqueta === "mitad"
+                  ? yTop + barHeight / 2
+                  : yTop + barHeight + 8;
+            return `translate(${cx},${y}) rotate(${-rotacionEtiqueta})`;
           }
         })
-        .text((d) => fmt(d.size))
+        .text((d) => fmt(d.size));
     }
-  })
+  });
 
   // add legend
   if (showLegend) {
     const legendLayer = d3
       .select(svgNode)
-      .append('g')
-      .attr('id', 'legend')
-      .attr('transform', `translate(${width},${marginTop})`)
+      .append("g")
+      .attr("id", "legend")
+      .attr("transform", `translate(${width},${marginTop})`);
 
-    const chartLegend = legend().legendWidth(legendWidth)
+    const chartLegend = legend().legendWidth(legendWidth);
 
     if (mapping.color.value) {
-      chartLegend.addColor(mapping.color.value, colorScale)
+      chartLegend.addColor(mapping.color.value, colorScale);
     }
 
-    legendLayer.call(chartLegend)
+    legendLayer.call(chartLegend);
   }
 }
 
 // auto format time scale if used as axis:
 
 function multiFormat(date) {
-  const formatMillisecond = d3.timeFormat('.%L'),
-    formatSecond = d3.timeFormat(':%S'),
-    formatMinute = d3.timeFormat('%I:%M'),
-    formatHour = d3.timeFormat('%I %p'),
-    formatDay = d3.timeFormat('%a %d'),
-    formatWeek = d3.timeFormat('%b %d'),
-    formatMonth = d3.timeFormat('%B'),
-    formatYear = d3.timeFormat('%Y')
+  const formatMillisecond = d3.timeFormat(".%L"),
+    formatSecond = d3.timeFormat(":%S"),
+    formatMinute = d3.timeFormat("%I:%M"),
+    formatHour = d3.timeFormat("%I %p"),
+    formatDay = d3.timeFormat("%a %d"),
+    formatWeek = d3.timeFormat("%b %d"),
+    formatMonth = d3.timeFormat("%B"),
+    formatYear = d3.timeFormat("%Y");
 
   console.log(
     d3.timeYear(date),
@@ -425,22 +462,24 @@ function multiFormat(date) {
     d3.timeDay(date),
     d3.timeHour(date),
     d3.timeMinute(date),
-    d3.timeSecond(date)
-  )
+    d3.timeSecond(date),
+  );
 
-  return (d3.timeSecond(date) < date
-    ? formatMillisecond
-    : d3.timeMinute(date) < date
-    ? formatSecond
-    : d3.timeHour(date) < date
-    ? formatMinute
-    : d3.timeDay(date) < date
-    ? formatHour
-    : d3.timeMonth(date) < date
-    ? d3.timeWeek(date) < date
-      ? formatDay
-      : formatWeek
-    : d3.timeYear(date) < date
-    ? formatMonth
-    : formatYear)(date)
+  return (
+    d3.timeSecond(date) < date
+      ? formatMillisecond
+      : d3.timeMinute(date) < date
+        ? formatSecond
+        : d3.timeHour(date) < date
+          ? formatMinute
+          : d3.timeDay(date) < date
+            ? formatHour
+            : d3.timeMonth(date) < date
+              ? d3.timeWeek(date) < date
+                ? formatDay
+                : formatWeek
+              : d3.timeYear(date) < date
+                ? formatMonth
+                : formatYear
+  )(date);
 }
