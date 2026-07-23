@@ -33,33 +33,6 @@ export const visualOptions = {
     default: false,
     group: 'artboard',
   },
-  ejexRotacionEtiquetas: {
-    type: 'number',
-    label: 'Rotación de etiquetas eje X',
-    default: 0,
-    min: -90,
-    max: 90,
-    group: 'artboard',
-  },
-  fuenteTipografica: {
-    type: 'text',
-    label: 'Fuente tipográfica',
-    group: 'artboard',
-    options: [
-      { label: 'Montserrat', value: 'Montserrat, sans-serif' },
-      { label: 'Noto', value: 'Noto Sans, sans-serif' },
-      { label: 'Popins', value: 'Poppins' },
-    ],
-    default: 'Montserrat, sans-serif',
-  },
-  muestraEjeY: {
-    type: 'boolean',
-    label: 'Mostrar eje Y',
-    default: true,
-    group: 'artboard',
-  },
-
-
   legendWidth: {
     type: 'number',
     label: 'Legend width',
@@ -73,6 +46,34 @@ export const visualOptions = {
       showLegend: true,
     },
   },
+  ejexRotacionEtiquetas: {
+    type: 'number',
+    label: 'Rotación de etiquetas eje X',
+    default: 0,
+    min: -90,
+    max: 90,
+    group: 'artboard',
+  },
+  fuenteTipografica: {
+    type: 'text',
+    label: 'Fuente tipográfica',
+    group: 'artboard',
+    options: [
+      { label: 'Montserrat', value: '"Montserrat", sans-serif' },
+      { label: 'Noto', value: '"Noto Sans", sans-serif' },
+      { label: 'Popins', value: '"Poppins"' },
+    ],
+    default: '"Montserrat", sans-serif',
+  },
+  muestraEjeY: {
+    type: 'boolean',
+    label: 'Mostrar eje Y',
+    default: true,
+    group: 'artboard',
+  },
+
+
+  
 
   padding: {
     type: 'number',
