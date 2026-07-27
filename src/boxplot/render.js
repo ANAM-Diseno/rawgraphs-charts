@@ -36,6 +36,9 @@ export function render(
     colorScale,
     // labels
     showValues,
+    ejexRotacionEtiquetas,
+    fuenteTipografica,
+    muestraEjeY,
   } = visualOptions
 
   // Margin convention
@@ -106,10 +109,20 @@ export function render(
     (d) => d.group
   )
   // append scales
-  svg
+  const yAxisGroup = svg
     .append('g')
     .attr('id', 'y axis')
     .call(d3.axisLeft(yScale))
+    .call((g) => g.select('path').remove())
+    .call((g) =>
+      g
+        .selectAll('g.tick line')
+        .style('stroke-dasharray', '3 3')
+        .style('stroke-opacity', 0.2)
+        .attr('x1', chartWidth)
+    )
+
+  yAxisGroup
     .append('text')
     .styles(styles.axisLabel)
     .attr('x', 4)
@@ -117,11 +130,22 @@ export function render(
     .attr('dominant-baseline', 'hanging')
     .text(mapping['value'].value)
 
-  svg
+  const xAxisGroup = svg
     .append('g')
     .attr('id', 'x axis')
     .attr('transform', 'translate(0,' + chartHeight + ')')
     .call(d3.axisBottom(xScale))
+
+  xAxisGroup
+    .selectAll('g.tick text')
+    .attr('transform', `translate(0,8)rotate(${ejexRotacionEtiquetas})`)
+    .attr('dy', `${-Math.abs(ejexRotacionEtiquetas / 90)}em`)
+    .style('dominant-baseline', ejexRotacionEtiquetas !== 0 ? 'middle' : 'inherit')
+    .style('text-anchor', ejexRotacionEtiquetas < 0 ? 'end' : ejexRotacionEtiquetas === 0 ? 'middle' : 'start')
+
+  yAxisGroup.selectAll('text').attr('font-family', fuenteTipografica)
+  xAxisGroup.selectAll('text').attr('font-family', fuenteTipografica)
+  if (!muestraEjeY) yAxisGroup.remove()
 
   //append boxplots
 

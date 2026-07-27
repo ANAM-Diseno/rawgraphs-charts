@@ -94,6 +94,9 @@ export function render(
     labelThresholds,
     showLabelsOutline,
     autoHideLabels,
+    ejexRotacionEtiquetas,
+    fuenteTipografica,
+    muestraEjeY,
   } = visualOptions
 
   const margin = {
@@ -216,8 +219,24 @@ export function render(
 
   const axisLayer = svg.append('g').attr('id', 'axis')
 
-  axisLayer.append('g').call(xAxis)
-  axisLayer.append('g').call(yAxis)
+  const xAxisGroup = axisLayer.append('g').call(xAxis)
+  xAxisGroup
+    .selectAll('g.tick text')
+    .attr('transform', `translate(0,8)rotate(${ejexRotacionEtiquetas})`)
+    .attr('dy', `${-Math.abs(ejexRotacionEtiquetas / 90)}em`)
+    .style('dominant-baseline', ejexRotacionEtiquetas !== 0 ? 'middle' : 'inherit')
+    .style('text-anchor', ejexRotacionEtiquetas < 0 ? 'end' : ejexRotacionEtiquetas === 0 ? 'middle' : 'start')
+  xAxisGroup.selectAll('text').attr('font-family', fuenteTipografica)
+
+  const yAxisGroup = axisLayer.append('g').call(yAxis)
+  yAxisGroup.select('path').remove()
+  yAxisGroup
+    .selectAll('g.tick line')
+    .style('stroke-dasharray', '3 3')
+    .style('stroke-opacity', 0.2)
+    .attr('x1', chartWidth)
+  yAxisGroup.selectAll('text').attr('font-family', fuenteTipografica)
+  if (!muestraEjeY) yAxisGroup.remove()
 
   const steps = 40
   if (showBandLabels) {
