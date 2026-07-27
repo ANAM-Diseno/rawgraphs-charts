@@ -44,6 +44,13 @@ export function render(
     // legend
     showLegend,
     legendWidth,
+    // layout
+    ejexRotacionEtiquetas,
+    fuenteTipografica,
+    muestraEjeY,
+    // etiquetas de valores
+    mostrarEtiquetas,
+    formatoEtiqueta,
   } = visualOptions
 
   const margin = {
@@ -279,8 +286,24 @@ export function render(
 
     const axisLayer = selection.append('g').attr('id', 'axis')
 
-    axisLayer.append('g').call(xAxis)
-    axisLayer.append('g').call(yAxis)
+    const xAxisGroup = axisLayer.append('g').call(xAxis)
+    xAxisGroup
+      .selectAll('g.tick text')
+      .attr('transform', `translate(0,8)rotate(${ejexRotacionEtiquetas})`)
+      .attr('dy', `${-Math.abs(ejexRotacionEtiquetas / 90)}em`)
+      .style('dominant-baseline', ejexRotacionEtiquetas !== 0 ? 'middle' : 'inherit')
+      .style('text-anchor', ejexRotacionEtiquetas < 0 ? 'end' : ejexRotacionEtiquetas === 0 ? 'middle' : 'start')
+    xAxisGroup.selectAll('text').attr('font-family', fuenteTipografica)
+
+    const yAxisGroup = axisLayer.append('g').call(yAxis)
+    yAxisGroup.select('path').remove()
+    yAxisGroup
+      .selectAll('g.tick line')
+      .style('stroke-dasharray', '3 3')
+      .style('stroke-opacity', 0.2)
+      .attr('x1', serieWidth)
+    yAxisGroup.selectAll('text').attr('font-family', fuenteTipografica)
+    if (!muestraEjeY) yAxisGroup.remove()
 
     // create a group for each line.
     // the group will contain the line and the dots.
@@ -316,7 +339,7 @@ export function render(
     if (showLabels) {
       let labels = groups
         .append('text')
-        .attr('font-family', 'sans-serif')
+        .attr('font-family', fuenteTipografica)
         .attr('font-size', 10)
         .attr('class', 'labels')
         .text((d) => d[0])
@@ -342,6 +365,32 @@ export function render(
           .attr('dy', -4)
           .attr('text-anchor', 'middle')
       }
+    }
+
+    if (mostrarEtiquetas) {
+      const fmt = formatoEtiqueta
+        ? (v) => {
+            try {
+              return d3.format(formatoEtiqueta)(v)
+            } catch (e) {
+              return v
+            }
+          }
+        : (v) => v
+
+      groups
+        .append('g')
+        .attr('class', 'etiquetas-valores')
+        .selectAll('text')
+        .data((d) => d[1])
+        .join('text')
+        .attr('font-family', fuenteTipografica)
+        .attr('font-size', 10)
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'auto')
+        .attr('x', (d) => xScale(d.x))
+        .attr('y', (d) => yScale(d.y) - 6)
+        .text((d) => fmt(d.y))
     }
 
     // add series titles

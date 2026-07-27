@@ -2,13 +2,13 @@ import icon from './barchartmultiset.svg'
 import thumbnail from './barchartmultiset_thumb.svg'
 
 export const metadata = {
-  name: 'Multi-set bar chart',
+  name: 'Gráfica de barras múltiples',
   thumbnail,
   icon,
   id: 'rawgraphs.barchartmultiset',
-  categories: ['correlations', 'proportions'],
+  categories: ['correlaciones', 'proporciones'],
   description:
-    'It displays multiple quantitative dimensions related to categories. bars are visually grouped in sets according to the categorical dimension, each bar represents a quantitative dimension, mapped on its height.',
+    'Muestra múltiples dimensiones cuantitativas relacionadas con categorías. Las barras se agrupan visualmente en conjuntos según la dimensión categórica; cada barra representa una dimensión cuantitativa mapeada en su altura.',
   code:
     'https://github.com/rawgraphs/rawgraphs-charts/tree/master/src/barchartmultiset',
   tutorial: 'https://rawgraphs.io/learning/how-to-make-a-multiset-barchart/',

@@ -36,6 +36,10 @@ export function render(
     // legend
     showLegend,
     legendWidth,
+    // layout
+    ejexRotacionEtiquetas,
+    fuenteTipografica,
+    muestraEjeY,
     // etiquetas de valores
     mostrarEtiquetas,
     posicionEtiqueta,
@@ -227,10 +231,25 @@ export function render(
       .attr('transform', 'translate(0,' + sizeScale(0) + ')')
       .call(d3.axisBottom(setScale).tickSizeOuter(0))
 
+    xAxis
+      .selectAll('g.tick text')
+      .attr('transform', `translate(0,8)rotate(${ejexRotacionEtiquetas})`)
+      .attr('dy', `${-Math.abs(ejexRotacionEtiquetas / 90)}em`)
+      .style('dominant-baseline', ejexRotacionEtiquetas !== 0 ? 'middle' : 'inherit')
+      .style('text-anchor', ejexRotacionEtiquetas < 0 ? 'end' : ejexRotacionEtiquetas === 0 ? 'middle' : 'start')
+
     const yAxis = selection
       .append('g')
       .attr('id', 'yAxis')
       .call(d3.axisLeft(sizeScale).tickSizeOuter(0))
+      .call((g) => g.select('path').remove())
+      .call((g) =>
+        g
+          .selectAll('g.tick line')
+          .style('stroke-dasharray', '3 3')
+          .style('stroke-opacity', 0.2)
+          .attr('x1', serieWidth)
+      )
 
     if (showSeriesLabels) {
       d3.select(this)
@@ -252,7 +271,7 @@ export function render(
       .text('Sets')
 
     // add the y axis titles
-    selection
+    const yAxisTitle = selection
       .append('text')
       .attr('y', 0)
       .attr('x', 4)
@@ -261,6 +280,13 @@ export function render(
       .attr('display', serieIndex == 0 || repeatAxesLabels ? null : 'none')
       .styles(styles.axisLabel)
       .text('Value')
+
+    xAxis.selectAll('text').attr('font-family', fuenteTipografica)
+    yAxis.selectAll('text').attr('font-family', fuenteTipografica)
+    if (!muestraEjeY) {
+      yAxis.remove()
+      yAxisTitle.remove()
+    }
 
     if (mostrarEtiquetas) {
       const fmt = formatoEtiqueta
@@ -279,6 +305,7 @@ export function render(
           rotacionEtiqueta < 0 ? 'end' : rotacionEtiqueta === 0 ? 'middle' : 'start'
         )
         .style('dominant-baseline', 'middle')
+        .attr('font-family', fuenteTipografica)
         .attr('transform', (d) => {
           const cx = setScale(d.groups) + barScale(d.bars) + barScale.bandwidth() / 2
           const yTop = sizeScale(Math.max(0, d.size))

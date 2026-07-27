@@ -48,6 +48,32 @@ export const visualOptions = {
     },
   },
 
+  ejexRotacionEtiquetas: {
+    type: 'number',
+    label: 'Rotación de etiquetas eje X',
+    default: 0,
+    min: -90,
+    max: 90,
+    group: 'artboard',
+  },
+  fuenteTipografica: {
+    type: 'text',
+    label: 'Fuente tipográfica',
+    group: 'artboard',
+    options: [
+      { label: 'Montserrat', value: '"Montserrat", sans-serif' },
+      { label: 'Noto', value: '"Noto Sans", sans-serif' },
+      { label: 'Poppins', value: '"Poppins"' },
+    ],
+    default: '"Montserrat", sans-serif',
+  },
+  muestraEjeY: {
+    type: 'boolean',
+    label: 'Mostrar eje Y',
+    default: true,
+    group: 'artboard',
+  },
+
   xOrigin: {
     type: 'boolean',
     label: 'Set X origin to 0',
@@ -187,5 +213,20 @@ export const visualOptions = {
     label: 'Use same X scale',
     default: true,
     group: 'series',
+  },
+
+  mostrarEtiquetas: {
+    type: 'boolean',
+    label: 'Mostrar etiquetas de valores',
+    default: false,
+    group: 'etiquetas',
+  },
+
+  formatoEtiqueta: {
+    type: 'text',
+    label: 'Formato de número (d3)',
+    default: '',
+    group: 'etiquetas',
+    disabled: { mostrarEtiquetas: false },
   },
 }

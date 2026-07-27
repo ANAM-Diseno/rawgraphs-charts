@@ -2,13 +2,13 @@ import icon from './bubblechart.svg'
 import thumbnail from './bubblechart_thumb.svg'
 
 export const metadata = {
-  name: 'Bubble chart',
+  name: 'Gráfica de burbujas',
   id: 'rawgraphs.bubblechart',
   thumbnail,
   icon,
-  categories: ['correlations', 'proportions'],
+  categories: ['correlaciones', 'proporciones'],
   description:
-    'The basic layout is a scatter plot, which allows to see correlations among two continuous dimensions. A further quantitative dimension with size and a quantitative or categorical dimension with color.',
+    'La disposición base es un diagrama de dispersión que permite visualizar correlaciones entre dos dimensiones continuas. Se puede añadir una dimensión cuantitativa al tamaño y una dimensión cuantitativa o categórica al color.',
   code:
     'https://github.com/rawgraphs/rawgraphs-charts/tree/master/src/bubblechart',
   tutorial: 'https://rawgraphs.io/learning/how-to-make-a-scatterplot/',
