@@ -31,6 +31,9 @@ export function render(
     legendWidth,
     // color dimension option, defined in visualOptions.js
     colorScale,
+    ejexRotacionEtiquetas,
+    fuenteTipografica,
+    muestraEjeY,
   } = visualOptions
 
   // Margin convention
@@ -112,10 +115,20 @@ export function render(
     .domain([-maxValue, maxValue])
 
   // append scales
-  svg
+  const yAxisGroup = svg
     .append('g')
     .attr('id', 'y axis')
     .call(d3.axisLeft(yScale))
+    .call((g) => g.select('path').remove())
+    .call((g) =>
+      g
+        .selectAll('g.tick line')
+        .style('stroke-dasharray', '3 3')
+        .style('stroke-opacity', 0.2)
+        .attr('x1', chartWidth)
+    )
+
+  yAxisGroup
     .append('text')
     .attr('x', 4)
     .attr('text-anchor', 'start')
@@ -123,17 +136,30 @@ export function render(
     .text(mapping['value'].value)
     .styles(styles.axisLabel)
 
-  svg
+  const xAxisGroup = svg
     .append('g')
     .attr('id', 'x axis')
     .attr('transform', 'translate(0,' + chartHeight + ')')
     .call(d3.axisBottom(xScale))
+
+  xAxisGroup
+    .selectAll('g.tick text')
+    .attr('transform', `translate(0,8)rotate(${ejexRotacionEtiquetas})`)
+    .attr('dy', `${-Math.abs(ejexRotacionEtiquetas / 90)}em`)
+    .style('dominant-baseline', ejexRotacionEtiquetas !== 0 ? 'middle' : 'inherit')
+    .style('text-anchor', ejexRotacionEtiquetas < 0 ? 'end' : ejexRotacionEtiquetas === 0 ? 'middle' : 'start')
+
+  xAxisGroup
     .append('text')
     .attr('x', chartWidth)
     .attr('dy', -5)
     .attr('text-anchor', 'end')
     .text(mapping['group'].value)
     .styles(styles.axisLabel)
+
+  yAxisGroup.selectAll('text').attr('font-family', fuenteTipografica)
+  xAxisGroup.selectAll('text').attr('font-family', fuenteTipografica)
+  if (!muestraEjeY) yAxisGroup.remove()
 
   let shapes = svg
     .append('g')

@@ -48,6 +48,26 @@ export const visualOptions = {
     },
   },
 
+  ejexRotacionEtiquetas: {
+    type: 'number',
+    label: 'Rotación de etiquetas eje X',
+    default: 0,
+    min: -90,
+    max: 90,
+    group: 'artboard',
+  },
+  fuenteTipografica: {
+    type: 'text',
+    label: 'Fuente tipográfica',
+    group: 'artboard',
+    options: [
+      { label: 'Montserrat', value: '"Montserrat", sans-serif' },
+      { label: 'Noto', value: '"Noto Sans", sans-serif' },
+      { label: 'Poppins', value: '"Poppins"' },
+    ],
+    default: '"Montserrat", sans-serif',
+  },
+
   interpolation: {
     type: 'text',
     label: 'Curves type',

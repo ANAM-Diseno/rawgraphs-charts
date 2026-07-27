@@ -30,6 +30,8 @@ export function render(
     streamsOffset,
     interpolation,
     showYAxis,
+    ejexRotacionEtiquetas,
+    fuenteTipografica,
     // series options
     columnsNumber,
     useSameScale,
@@ -232,12 +234,28 @@ export function render(
       .attr('transform', 'translate(0,' + serieHeight + ')')
       .call(d3.axisBottom(xScale).tickSizeOuter(0))
 
+    xAxis
+      .selectAll('g.tick text')
+      .attr('transform', `translate(0,8)rotate(${ejexRotacionEtiquetas})`)
+      .attr('dy', `${-Math.abs(ejexRotacionEtiquetas / 90)}em`)
+      .style('dominant-baseline', ejexRotacionEtiquetas !== 0 ? 'middle' : 'inherit')
+      .style('text-anchor', ejexRotacionEtiquetas < 0 ? 'end' : ejexRotacionEtiquetas === 0 ? 'middle' : 'start')
+    xAxis.selectAll('text').attr('font-family', fuenteTipografica)
+
     if (showYAxis) {
       const yAxis = selection
         .append('g')
         .attr('id', 'yAxis')
-        //.attr('transform', 'translate(0,' + serieHeight + ')')
         .call(d3.axisLeft(sizeScale).tickSizeOuter(0))
+        .call((g) => g.select('path').remove())
+        .call((g) =>
+          g
+            .selectAll('g.tick line')
+            .style('stroke-dasharray', '3 3')
+            .style('stroke-opacity', 0.2)
+            .attr('x1', serieWidth)
+        )
+      yAxis.selectAll('text').attr('font-family', fuenteTipografica)
     }
 
     if (showSeriesLabels) {
